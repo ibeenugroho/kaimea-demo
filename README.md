@@ -51,13 +51,11 @@ The engine only answers websites listed in its `ALLOWED_ORIGINS` setting, so add
 | Path | Purpose |
 |---|---|
 | `index.html` | Page structure |
-| `css/styles.css` | Styles, light and dark themes |
+| `css/styles.css` | Styles (light theme) |
 | `js/config.js` | Engine address |
 | `js/api.js` | Calls the engine; looks up demo results |
-| `js/labels.js` | Water parameter names and units |
 | `js/demo-data.js` | Sample ponds and their pre-computed results |
-| `js/app-en.js`, `js/app-id.js` | Dashboard screens in English and Indonesian |
-| `js/boot.js` | Language switch |
+| `js/app.js` | Dashboard screens, Indonesian and English text, language switch |
 
 ## Disclaimer
 
