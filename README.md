@@ -52,6 +52,7 @@ The engine only answers websites listed in its `ALLOWED_ORIGINS` setting, so add
 |---|---|
 | `index.html` | Page structure |
 | `css/styles.css` | Styles (light theme) |
+| `img/kaimea-logo.png` | KAIMEA logo (header and browser tab) |
 | `js/config.js` | Engine address |
 | `js/api.js` | Calls the engine; looks up demo results |
 | `js/demo-data.js` | Sample ponds and their pre-computed results |
