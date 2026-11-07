@@ -27,7 +27,7 @@ const STR = {
     heroRisk: (w, pct, money) => `Risiko penyakit ${w} (${pct}%). Sekitar ${money} dipertaruhkan bila dibiarkan.`,
     heroGreen: "Air dalam batas aman. Lanjutkan PROBAL rutin dan ukur setiap hari.",
     best: "Saran utama", worth: "nilai", stale: n => `data terakhir ${n} hari lalu`,
-    act: { continue: "Lanjut sesuai SOP", harvest: "Panen dini", fix: "Perbaiki air + PROBAL dosis tinggi", boost: "PROBAL dosis tinggi" },
+    act: { continue: "Lanjut sesuai SOP", watch: "Pantau ketat, lanjut SOP", harvest: "Panen dini", fix: "Perbaiki air + PROBAL dosis tinggi", boost: "PROBAL dosis tinggi" },
     grp: { Water: "Perbaiki air", PROBAL: "PROBAL", Pathogen: "Tanggap penyakit", Testing: "Pengujian" },
     tiers: ["Catat air setiap hari (gratis)", "Uji kit di tepi kolam", "Uji lab qPCR"],
     how: "Cara melakukannya", done: (d, n) => `${d} dari ${n} selesai`, planNote: "Centang saat selesai. Ukur ulang 1–2 hari setelah perbaikan air.",
@@ -43,7 +43,7 @@ const STR = {
     covLow: "Data masih sedikit, jadi skor bisa lebih rendah dari kenyataan.",
     fDaily: "Harian (subuh)", fExtra: "Tambahan", fExtraQ: "opsional", fWeekly: "Mingguan", fTests: "Hasil uji",
     fDate: "Tanggal", fDoc: "Hari ke- (DOC)", fAbw: "Berat rata-rata (g)", blank: "Kosongkan yang tidak diukur.",
-    fGut: "Skor usus (SD)", fWssv: "Tabung WSSV", fPirab: "Tabung pirAB (AHPND)", fEhp: "EHP (log kopi/ng)",
+    fGut: "Skor usus (SD)", fWssv: "Tabung WSSV", fPirab: "Tabung pirAB (AHPND)", fImnv: "Tabung IMNV", fEhp: "EHP (log kopi/ng)",
     tv: { "": "belum diuji", neg: "negatif", pos: "positif" }, saveReading: "Simpan & perbarui rencana",
     prefilled: "Terisi dari pengukuran terakhir. Ubah yang berbeda saja.", orpHint: "ORP: ukur di lumpur segar dari tengah kolam.",
     trend: "Tren stres air", trendNeed: "Tren muncul setelah dua pengukuran.", hDate: "Tanggal", hStress: "Stres", del: "Hapus", confirm: "Yakin?",
@@ -80,7 +80,7 @@ const STR = {
     heroRisk: (w, pct, money) => `Disease risk is ${w} (${pct}%). About ${money} at stake if nothing changes.`,
     heroGreen: "Water is in range. Keep routine PROBAL and daily readings.",
     best: "Best move", worth: "worth", stale: n => `last reading ${n} days old`,
-    act: { continue: "Continue as usual", harvest: "Harvest early", fix: "Fix water + PROBAL boost", boost: "PROBAL boost" },
+    act: { continue: "Continue as usual", watch: "Watch closely, keep to SOP", harvest: "Harvest early", fix: "Fix water + PROBAL boost", boost: "PROBAL boost" },
     grp: { Water: "Fix the water", PROBAL: "PROBAL", Pathogen: "Disease response", Testing: "Testing" },
     tiers: ["Log water daily (free)", "Pond-side kit test", "Lab qPCR test"],
     how: "How to do it", done: (d, n) => `${d} of ${n} done`, planNote: "Tick items when done. Re-measure 1–2 days after a water fix.",
@@ -96,7 +96,7 @@ const STR = {
     covLow: "Few readings, so the score may understate the stress.",
     fDaily: "Daily (dawn)", fExtra: "Extra", fExtraQ: "optional", fWeekly: "Weekly", fTests: "Test results",
     fDate: "Date", fDoc: "Day of culture", fAbw: "Mean weight (g)", blank: "Leave blank if not measured.",
-    fGut: "Gut score (SD)", fWssv: "WSSV tube", fPirab: "pirAB tube (AHPND)", fEhp: "EHP (log copies/ng)",
+    fGut: "Gut score (SD)", fWssv: "WSSV tube", fPirab: "pirAB tube (AHPND)", fImnv: "IMNV tube", fEhp: "EHP (log copies/ng)",
     tv: { "": "not tested", neg: "negative", pos: "positive" }, saveReading: "Save & update plan",
     prefilled: "Pre-filled from the last reading. Change only what differs.", orpHint: "ORP: measure in fresh mud from the pond centre.",
     trend: "Water stress trend", trendNeed: "The trend appears after two readings.", hDate: "Date", hStress: "Stress", del: "Delete", confirm: "Sure?",
@@ -128,6 +128,9 @@ const pname = n => String(n || "").replace(/\((contoh|example)\)\s*$/i, L === "e
 const farmName = n => (!n || DEFAULT_FARMS.includes(n)) ? W().farmDefault : n;
 const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 const dayDiff = (a, b) => Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 864e5);
+// Demo mode: sample readings are dated; measure their age against the sample's own latest date, not today.
+const DEMO_REF = (window.KAIMEA_DEMO_SEED && window.KAIMEA_DEMO_SEED.readings || []).reduce((m, r) => (r.date > m ? r.date : m), "");
+const refDay = () => (API.mode() === "demo" && DEMO_REF && S.readings.some(r => /^rex/.test(r.id || ""))) ? DEMO_REF : today();
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
 /* ---------- state + storage (this browser only) ---------- */
@@ -155,7 +158,7 @@ function makeBody(p, rs) {
 function evaluate(p) {
   const rs = pondReadings(p.id), last = rs[0];
   if (!last) return { p, rs, last: null };
-  const age = dayDiff(last.date, today()), body = makeBody(p, rs), key = API.keyOf(body), hit = CACHE.get(p.id);
+  const age = dayDiff(last.date, refDay()), body = makeBody(p, rs), key = API.keyOf(body), hit = CACHE.get(p.id);
   if ((!hit || hit.key !== key) && INFLIGHT.get(p.id) !== key) {
     INFLIGHT.set(p.id, key);
     API.evaluate(body).then(v => ({ key, v }), e => ({ key, err: (e && e.code) || "offline" })).then(entry => {
@@ -166,7 +169,7 @@ function evaluate(p) {
   if (!hit || hit.key !== key) return { p, rs, last, age, status: "pending" };
   if (hit.err) return { p, rs, last, age, status: hit.err };
   const r = hit.v.result;
-  const act = r.best === "intervene" ? (r.plan.items.length ? W().act.fix : W().act.boost) : W().act[r.best];
+  const act = r.best === "intervene" ? (r.plan.items.length ? W().act.fix : W().act.boost) : (r.best === "continue" && r.zone !== "green") ? W().act.watch : W().act[r.best];
   return { p, rs, last, age, r, act, doc: hit.v.doc, persist: hit.v.persist, hist: hit.v.history, A: +p.area || 1 };
 }
 const priority = e => !e.r ? -1 : ({ red: 3, yellow: 2, green: 1 }[e.r.zone] * 1e4 + e.r.lossContinue * e.A);
@@ -314,7 +317,7 @@ function logForm(p, e) {
     <details class="more"><summary>${w.fWeekly}</summary><div class="fgrid">${weekly.map(f).join("")}</div>${weekly.some(x => x[0] === "soil_orp") ? `<p class="muted small">${w.orpHint}</p>` : ""}</details>
     <details class="more"><summary>${w.fTests}</summary><div class="fgrid">
       <label class="fld"><span>${w.fGut}</span><input id="t_gut" type="number" step="0.1" value="${esc(t.gutScore ?? "")}"></label>
-      ${sel("t_wssv", w.fWssv, t.wssv)}${sel("t_pirab", w.fPirab, t.pirab)}
+      ${sel("t_wssv", w.fWssv, t.wssv)}${sel("t_pirab", w.fPirab, t.pirab)}${sel("t_imnv", w.fImnv, t.imnv)}
       <label class="fld"><span>${w.fEhp}</span><input id="t_ehp" type="number" step="0.1" value="${esc(t.ehpLog ?? "")}"></label></div></details>
     <div class="row-end"><span class="muted small">${w.blank}</span><button class="btn primary" type="submit">${w.saveReading}</button></div></form>`;
 }
@@ -347,7 +350,7 @@ function bindPond(p, e) {
     ev.preventDefault(); const obs = {};
     DAILY.concat(EXTRA, WEEKLY).forEach(([k]) => { const v = num("w_" + k); if (v != null) obs[k] = v; });
     if (!Object.keys(obs).length) { toast(w.toastNeedOne); return; }
-    const test = { gutScore: num("t_gut"), auc: 0.83, wssv: $("t_wssv").value, pirab: $("t_pirab").value, ehpLog: num("t_ehp") };
+    const test = { gutScore: num("t_gut"), auc: 0.83, wssv: $("t_wssv").value, pirab: $("t_pirab").value, imnv: $("t_imnv").value, ehpLog: num("t_ehp") };
     Object.keys(test).forEach(k => (test[k] === null || test[k] === "") && delete test[k]);
     const date = $("r_date").value || today(), same = e.rs.find(x => x.date === date);
     const row = { pondId: p.id, date, obs, test, abw: num("r_abw"), at: Date.now(), done: {} };
