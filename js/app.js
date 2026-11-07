@@ -23,7 +23,7 @@ const STR = {
     pEarly: "Peluang tindakan cukup dini", pEarlyHint: "Biarkan 0,5 sampai uji lapangan memberi angka sendiri.",
     exampleNote: "Kolam bertanda (contoh) adalah data contoh. Hapus dari halaman kolamnya.",
     back: "Semua kolam", tabs: { cond: "Kondisi", plan: "Rencana", log: "Catat data", hist: "Riwayat" },
-    riskWord: x => x >= 2 / 3 ? "tinggi" : x >= 1 / 3 ? "sedang" : "rendah", rk: { L: "Rendah", M: "Sedang", H: "Tinggi" },
+    riskWord: x => x >= 0.45 ? "tinggi" : x >= 0.15 ? "sedang" : "rendah", rk: { L: "Rendah", M: "Sedang", H: "Tinggi" }, rkSub: "peluang sakit berat",
     heroRisk: (w, pct, money) => `Risiko penyakit ${w} (peluang sakit berat ${pct}%). Sekitar ${money} dipertaruhkan bila dibiarkan.`,
     heroGreen: "Air dalam batas aman. Lanjutkan PROBAL rutin dan ukur setiap hari.",
     best: "Saran utama", worth: "nilai", stale: n => `data terakhir ${n} hari lalu`,
@@ -36,9 +36,16 @@ const STR = {
     tier: { Low: "Rendah", Moderate: "Sedang", High: "Tinggi", Critical: "Kritis" },
     off: "Yang perlu diperhatikan", allOk: "Semua yang diukur dalam batas aman.", okList: "Normal",
     clock: (a, b) => `Peluang wabah dalam 7 hari: <b>${a}%</b> tanpa tindakan, <b>${b}%</b> setelah perbaikan air.`,
-    money: "Pilihan dan hasil siklus", moneyQ: "Perkiraan untung (atau rugi) kolam ini per siklus",
-    optC: "Lanjut", optI: "Bertindak", optH: "Panen dini", bestTag: "terbaik",
+    money: "Pilihan dan hasil siklus", moneyQ: "Perkiraan laba operasional (atau rugi) kolam ini untuk siklus ini, setelah pakan, benur, biaya operasional dan biaya tindakan",
+    optC: "Lanjut", optI: "Bertindak", optH: "Panen dini", bestTag: "disarankan", smallGain: (d) => `Bertindak hanya menambah ±${d}, terlalu kecil dibanding usaha dan ketidakpastiannya, jadi disarankan lanjut sesuai SOP.`,
     optCd: "Tanpa tindakan tambahan", optId: "Perbaikan air + PROBAL", optHd: "Jual di ukuran ±9 g", optHn: d => `Udang belum 9 g (±${d} hari lagi)`,
+    whenHarvest: d => d > 0 ? `terwujud saat panen, ±${d} hari lagi` : "terwujud saat panen",
+    vsC: (d) => `${d} dibanding lanjut`,
+    averted: (a, c) => `kerugian dicegah ${a} − biaya tindakan ${c}`,
+    actWhen: d => `biaya dibayar minggu ini; hasilnya terlihat saat panen${d > 0 ? `, ±${d} hari lagi` : ""}`,
+    harvAvert: a => `kerugian dihindari ${a}: udang dijual sebelum penyakit memburuk`,
+    harvWorse: a => `${a} lebih rendah: panen dini mengorbankan pertumbuhan`,
+    harvWhen: "uang diterima dalam ±2 hari",
     priceNote: m => `Kolam sehat: ${m}. Harga masih perkiraan (udang Rp 55.000/kg, pakan Rp 16.000/kg).`,
     covLow: "Data masih sedikit, jadi skor bisa lebih rendah dari kenyataan.",
     fDaily: "Harian (subuh)", fExtra: "Tambahan", fExtraQ: "opsional", fWeekly: "Mingguan", fTests: "Hasil uji",
@@ -76,7 +83,7 @@ const STR = {
     pEarly: "Chance action is early enough", pEarlyHint: "Keep 0.5 until a field trial gives your own number.",
     exampleNote: "Ponds marked (example) are sample data. Delete them from their pond page.",
     back: "All ponds", tabs: { cond: "Condition", plan: "Plan", log: "Add reading", hist: "History" },
-    riskWord: x => x >= 2 / 3 ? "high" : x >= 1 / 3 ? "moderate" : "low", rk: { L: "Low", M: "Moderate", H: "High" },
+    riskWord: x => x >= 0.45 ? "high" : x >= 0.15 ? "moderate" : "low", rk: { L: "Low", M: "Moderate", H: "High" }, rkSub: "chance of serious disease",
     heroRisk: (w, pct, money) => `Disease risk is ${w} (serious disease ${pct}%). About ${money} at stake if nothing changes.`,
     heroGreen: "Water is in range. Keep routine PROBAL and daily readings.",
     best: "Best move", worth: "worth", stale: n => `last reading ${n} days old`,
@@ -89,9 +96,16 @@ const STR = {
     tier: { Low: "Low", Moderate: "Moderate", High: "High", Critical: "Critical" },
     off: "What needs attention", allOk: "Everything measured is in range.", okList: "In range",
     clock: (a, b) => `Chance of an outbreak within 7 days: <b>${a}%</b> with no action, <b>${b}%</b> after the water fix.`,
-    money: "Options and cycle result", moneyQ: "Expected profit (or loss) for this pond this cycle",
-    optC: "Continue", optI: "Act", optH: "Harvest early", bestTag: "best",
+    money: "Options and cycle result", moneyQ: "Expected operating profit (or loss) for this pond this cycle, after feed, post-larvae, running costs and the cost of the action",
+    optC: "Continue", optI: "Act", optH: "Harvest early", bestTag: "recommended", smallGain: (d) => `Acting would add only about ${d}, too little for the effort and uncertainty, so keep to the SOP.`,
     optCd: "No extra action", optId: "Water fix + PROBAL", optHd: "Sell at about 9 g", optHn: d => `Shrimp not 9 g yet (~${d} days)`,
+    whenHarvest: d => d > 0 ? `realised at harvest, in about ${d} days` : "realised at harvest",
+    vsC: (d) => `${d} vs continuing`,
+    averted: (a, c) => `loss averted ${a} − action cost ${c}`,
+    actWhen: d => `cost paid this week; the result shows at harvest${d > 0 ? `, in about ${d} days` : ""}`,
+    harvAvert: a => `loss avoided ${a}: shrimp sold before disease gets worse`,
+    harvWorse: a => `${a} less: harvesting early gives up growth`,
+    harvWhen: "money received within about 2 days",
     priceNote: m => `A healthy pond earns ${m}. Prices are estimates (shrimp Rp 55,000/kg, feed Rp 16,000/kg).`,
     covLow: "Few readings, so the score may understate the stress.",
     fDaily: "Daily (dawn)", fExtra: "Extra", fExtraQ: "optional", fWeekly: "Weekly", fTests: "Test results",
@@ -172,13 +186,13 @@ function evaluate(p) {
   const act = r.best === "intervene" ? (r.plan.items.length ? W().act.fix : W().act.boost) : (r.best === "continue" && r.zone !== "green") ? W().act.watch : W().act[r.best];
   return { p, rs, last, age, r, act, doc: hit.v.doc, persist: hit.v.persist, hist: hit.v.history, A: +p.area || 1 };
 }
-// Disease-risk position on the traffic-light bar: expected risk class, 0 = Low, 0.5 = Moderate, 1 = High.
-const riskPos = p => (p[1] + 2 * p[2]) / 2;
+// Disease risk = chance of serious disease (High class). Same cut-offs as the engine's light: < 15% low, 15–45% moderate, ≥ 45% high.
+const riskPos = p => p[2];
 function riskTile(p, w) {
-  const x = riskPos(p), k = x >= 2 / 3 ? "H" : x >= 1 / 3 ? "M" : "L", pc = v => fmt(v * 100, 0) + "%";
-  return `<b class="rk rk-${k}">${w.rk[k]}</b>
-    <div class="tl" role="img" aria-label="${w.rk[k]}: ${w.rk.L} ${pc(p[0])}, ${w.rk.M} ${pc(p[1])}, ${w.rk.H} ${pc(p[2])}"><div class="tlbar"><i class="g"></i><i class="y"></i><i class="r"></i></div><span class="tri" style="left:${(Math.min(0.97, Math.max(0.03, x)) * 100).toFixed(1)}%"></span></div>
-    <div class="tlp"><span>${w.rk.L} <b>${pc(p[0])}</b></span><span>${w.rk.M} <b>${pc(p[1])}</b></span><span>${w.rk.H} <b>${pc(p[2])}</b></span></div>`;
+  const x = p[2], k = x >= 0.45 ? "H" : x >= 0.15 ? "M" : "L";
+  return `<b class="rk rk-${k}">${fmt(x * 100, 0)}<small>%</small></b><em class="rk rk-${k}">${w.rk[k]} · ${w.rkSub}</em>
+    <div class="tl" role="img" aria-label="${w.rk[k]}, ${fmt(x * 100, 0)}%"><div class="tlbar"><i class="g"></i><i class="y"></i><i class="r"></i></div><span class="tri" style="left:${(Math.min(0.98, Math.max(0.02, x)) * 100).toFixed(1)}%"></span></div>
+    <div class="tlp"><span style="left:0;transform:none">0%</span><span style="left:15%">15%</span><span style="left:45%">45%</span><span style="left:100%;transform:translateX(-100%)">100%</span></div>`;
 }
 const priority = e => !e.r ? -1 : ({ red: 3, yellow: 2, green: 1 }[e.r.zone] * 1e4 + e.r.lossContinue * e.A);
 function checklist(e) {
@@ -305,8 +319,15 @@ function condition(e) {
   const notes = (S2.notes || []).concat(S2.coverage < 0.5 ? [w.covLow] : []);
   if (notes.length) h += `<p class="note">${notes.map(esc).join(" ")}</p>`;
   h += `<p class="clock">${w.clock(fmt(r.clock.noAction[6].cum * 100, 0), fmt(r.clock.withFix[6].cum * 100, 0))}</p>`;
-  const opt = (k, n, d) => { const v = r.exp[k]; return `<div class="opt ${r.best === k ? "best" : ""}"><span>${n}${r.best === k ? `<i>${w.bestTag}</i>` : ""}</span><b class="${v != null && v < 0 ? "t-bad" : ""}">${v == null ? "–" : rp(v * e.A, 1)}</b><em>${d}</em></div>`; };
-  h += `<h3 class="grp">${w.money}</h3><p class="muted small" style="margin-top:-6px">${w.moneyQ}</p><div class="opts">${opt("continue", w.optC, w.optCd)}${opt("intervene", w.optI, w.optId)}${opt("harvest", w.optH, r.harvestFeasible ? w.optHd : w.optHn(r.dTo9))}</div>
+  const left = Math.max(0, (r.cycleDays || 120) - (e.doc || 0)), A = e.A, sgn = v => (v >= 0 ? "+" : "−") + rp(Math.abs(v), 1);
+  const opt = (k, n, lines) => { const v = r.exp[k]; return `<div class="opt ${r.best === k ? "best" : ""}"><span>${n}${r.best === k ? `<i>${w.bestTag}</i>` : ""}</span><b class="${v != null && v < 0 ? "t-bad" : ""}">${v == null ? "–" : rp(v * A, 1)}</b>${lines.filter(Boolean).map((l, i) => `<em${i === 0 && l.startsWith("<") ? "" : ""}>${l}</em>`).join("")}</div>`; };
+  const dI = r.exp.intervene != null ? (r.exp.intervene - r.exp.continue) * A : null, cost = (r.actionCost || 0) * A;
+  const dH = r.exp.harvest != null ? (r.exp.harvest - r.exp.continue) * A : null;
+  const linesC = [w.optCd, w.whenHarvest(left)];
+  const linesI = dI == null ? [w.optId] : [w.optId, `<strong class="${dI >= 0 ? "t-good" : "t-bad"}">${w.vsC(sgn(dI))}</strong>`, w.averted(rp(dI + cost, 1), rp(cost, 1)), w.actWhen(left)];
+  const linesH = !r.harvestFeasible || dH == null ? [w.optHn(r.dTo9)] : [w.optHd, `<strong class="${dH >= 0 ? "t-good" : "t-bad"}">${w.vsC(sgn(dH))}</strong>`, dH >= 0 ? w.harvAvert(rp(dH, 1)) : w.harvWorse(rp(-dH, 1)), w.harvWhen];
+  h += `<h3 class="grp">${w.money}</h3><p class="muted small" style="margin-top:-6px">${w.moneyQ}</p><div class="opts">${opt("continue", w.optC, linesC)}${opt("intervene", w.optI, linesI)}${opt("harvest", w.optH, linesH)}</div>
+  ${(() => { const alt = Math.max(r.exp.intervene ?? -1e9, r.exp.harvest ?? -1e9); return r.best === "continue" && alt > r.exp.continue ? `<p class="note">${w.smallGain(rp((alt - r.exp.continue) * A, 1))}</p>` : ""; })()}
   <p class="muted small">${w.priceNote(rp(r.healthy.margin * e.A, 0))}</p>`;
   return h;
 }
