@@ -173,3 +173,12 @@ td{padding:10px;border-bottom:1px solid var(--line)} tr:last-child td{border-bot
   .prm{grid-template-columns:1fr auto} .prm .sbar{grid-column:1/-1}
   .hero{padding:18px}
 }
+
+/* disease-risk traffic light */
+.tile b.rk{font-size:26px} .rk-L{color:#2e8b57} .rk-M{color:#b7791f} .rk-H{color:#c0392b}
+.tl{position:relative;margin-top:8px;padding-bottom:12px}
+.tlbar{display:flex;height:10px;border-radius:999px;overflow:hidden}
+.tlbar i{flex:1} .tlbar i.g{background:#8fd0a8} .tlbar i.y{background:#f0c674} .tlbar i.r{background:#e0806f}
+.tl .tri{position:absolute;top:11px;width:0;height:0;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:10px solid var(--ink,#14211f)}
+.tlp{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--muted)}
+.tlp b{font-size:12.5px;font-weight:700;color:var(--ink,#14211f)}

@@ -22,9 +22,9 @@ const STR = {
     caseHint: "A: sekitar 6 dari 10 kolam terkena penyakit per siklus. B: sekitar 4–5 dari 10.",
     pEarly: "Peluang tindakan cukup dini", pEarlyHint: "Biarkan 0,5 sampai uji lapangan memberi angka sendiri.",
     exampleNote: "Kolam bertanda (contoh) adalah data contoh. Hapus dari halaman kolamnya.",
-    back: "Semua kolam", tabs: { plan: "Rencana", cond: "Kondisi", log: "Catat data", hist: "Riwayat" },
-    riskWord: p => p >= 0.5 ? "tinggi" : p >= 0.25 ? "sedang" : "rendah",
-    heroRisk: (w, pct, money) => `Risiko penyakit ${w} (${pct}%). Sekitar ${money} dipertaruhkan bila dibiarkan.`,
+    back: "Semua kolam", tabs: { cond: "Kondisi", plan: "Rencana", log: "Catat data", hist: "Riwayat" },
+    riskWord: x => x >= 2 / 3 ? "tinggi" : x >= 1 / 3 ? "sedang" : "rendah", rk: { L: "Rendah", M: "Sedang", H: "Tinggi" },
+    heroRisk: (w, pct, money) => `Risiko penyakit ${w} (peluang sakit berat ${pct}%). Sekitar ${money} dipertaruhkan bila dibiarkan.`,
     heroGreen: "Air dalam batas aman. Lanjutkan PROBAL rutin dan ukur setiap hari.",
     best: "Saran utama", worth: "nilai", stale: n => `data terakhir ${n} hari lalu`,
     act: { continue: "Lanjut sesuai SOP", watch: "Pantau ketat, lanjut SOP", harvest: "Panen dini", fix: "Perbaiki air + PROBAL dosis tinggi", boost: "PROBAL dosis tinggi" },
@@ -32,7 +32,7 @@ const STR = {
     tiers: ["Catat air setiap hari (gratis)", "Uji kit di tepi kolam", "Uji lab qPCR"],
     how: "Cara melakukannya", done: (d, n) => `${d} dari ${n} selesai`, planNote: "Centang saat selesai. Ukur ulang 1–2 hari setelah perbaikan air.",
     noPlan: "Tidak ada tindakan khusus. Lanjutkan rutinitas.", saves: "hemat",
-    tStress: "Stres air", tRisk: "Risiko penyakit berat", tHarvest: "Perkiraan panen", of: "dari",
+    tStress: "Stres air", tRisk: "Risiko penyakit", tHarvest: "Perkiraan panen", of: "dari",
     tier: { Low: "Rendah", Moderate: "Sedang", High: "Tinggi", Critical: "Kritis" },
     off: "Yang perlu diperhatikan", allOk: "Semua yang diukur dalam batas aman.", okList: "Normal",
     clock: (a, b) => `Peluang wabah dalam 7 hari: <b>${a}%</b> tanpa tindakan, <b>${b}%</b> setelah perbaikan air.`,
@@ -75,9 +75,9 @@ const STR = {
     caseHint: "A: about 6 in 10 ponds get disease in a cycle. B: about 4–5 in 10.",
     pEarly: "Chance action is early enough", pEarlyHint: "Keep 0.5 until a field trial gives your own number.",
     exampleNote: "Ponds marked (example) are sample data. Delete them from their pond page.",
-    back: "All ponds", tabs: { plan: "Plan", cond: "Condition", log: "Add reading", hist: "History" },
-    riskWord: p => p >= 0.5 ? "high" : p >= 0.25 ? "moderate" : "low",
-    heroRisk: (w, pct, money) => `Disease risk is ${w} (${pct}%). About ${money} at stake if nothing changes.`,
+    back: "All ponds", tabs: { cond: "Condition", plan: "Plan", log: "Add reading", hist: "History" },
+    riskWord: x => x >= 2 / 3 ? "high" : x >= 1 / 3 ? "moderate" : "low", rk: { L: "Low", M: "Moderate", H: "High" },
+    heroRisk: (w, pct, money) => `Disease risk is ${w} (serious disease ${pct}%). About ${money} at stake if nothing changes.`,
     heroGreen: "Water is in range. Keep routine PROBAL and daily readings.",
     best: "Best move", worth: "worth", stale: n => `last reading ${n} days old`,
     act: { continue: "Continue as usual", watch: "Watch closely, keep to SOP", harvest: "Harvest early", fix: "Fix water + PROBAL boost", boost: "PROBAL boost" },
@@ -85,7 +85,7 @@ const STR = {
     tiers: ["Log water daily (free)", "Pond-side kit test", "Lab qPCR test"],
     how: "How to do it", done: (d, n) => `${d} of ${n} done`, planNote: "Tick items when done. Re-measure 1–2 days after a water fix.",
     noPlan: "Nothing special to do. Keep the routine.", saves: "saves",
-    tStress: "Water stress", tRisk: "Serious disease risk", tHarvest: "Expected harvest", of: "of",
+    tStress: "Water stress", tRisk: "Disease risk", tHarvest: "Expected harvest", of: "of",
     tier: { Low: "Low", Moderate: "Moderate", High: "High", Critical: "Critical" },
     off: "What needs attention", allOk: "Everything measured is in range.", okList: "In range",
     clock: (a, b) => `Chance of an outbreak within 7 days: <b>${a}%</b> with no action, <b>${b}%</b> after the water fix.`,
@@ -172,6 +172,14 @@ function evaluate(p) {
   const act = r.best === "intervene" ? (r.plan.items.length ? W().act.fix : W().act.boost) : (r.best === "continue" && r.zone !== "green") ? W().act.watch : W().act[r.best];
   return { p, rs, last, age, r, act, doc: hit.v.doc, persist: hit.v.persist, hist: hit.v.history, A: +p.area || 1 };
 }
+// Disease-risk position on the traffic-light bar: expected risk class, 0 = Low, 0.5 = Moderate, 1 = High.
+const riskPos = p => (p[1] + 2 * p[2]) / 2;
+function riskTile(p, w) {
+  const x = riskPos(p), k = x >= 2 / 3 ? "H" : x >= 1 / 3 ? "M" : "L", pc = v => fmt(v * 100, 0) + "%";
+  return `<b class="rk rk-${k}">${w.rk[k]}</b>
+    <div class="tl" role="img" aria-label="${w.rk[k]}: ${w.rk.L} ${pc(p[0])}, ${w.rk.M} ${pc(p[1])}, ${w.rk.H} ${pc(p[2])}"><div class="tlbar"><i class="g"></i><i class="y"></i><i class="r"></i></div><span class="tri" style="left:${(Math.min(0.97, Math.max(0.03, x)) * 100).toFixed(1)}%"></span></div>
+    <div class="tlp"><span>${w.rk.L} <b>${pc(p[0])}</b></span><span>${w.rk.M} <b>${pc(p[1])}</b></span><span>${w.rk.H} <b>${pc(p[2])}</b></span></div>`;
+}
 const priority = e => !e.r ? -1 : ({ red: 3, yellow: 2, green: 1 }[e.r.zone] * 1e4 + e.r.lossContinue * e.A);
 function checklist(e) {
   const r = e.r, list = [];
@@ -250,13 +258,13 @@ function card(e) {
 /* ---------- pond screen ---------- */
 function renderPond(id, tabArg) {
   const w = W(), p = S.ponds.find(x => x.id === id), e = evaluate(p);
-  const tab = tabArg && w.tabs[tabArg] ? tabArg : (e.last ? "plan" : "log");
+  const tab = tabArg && w.tabs[tabArg] ? tabArg : (e.last ? "cond" : "log");
   const type = p.pondType ? " · " + (p.pondType === "earthen" ? w.earthen : w.lined) : "";
   let h = `<a class="back" href="#">← ${w.back}</a>
   <div class="pond-head"><div><h1>${esc(pname(p.name))}</h1><p class="muted">${fmt(+p.area || 1, 2)} ha${e.doc ? " · DOC " + e.doc : ""}${p.density ? " · " + p.density + " PL/m²" : ""}${type}</p></div></div>`;
   if (e.r) {
     const r = e.r, z = r.zone, pct = fmt(r.R.post[2] * 100, 0);
-    const line = z === "green" ? w.heroGreen : w.heroRisk(w.riskWord(r.R.post[2]), pct, rp(r.lossContinue * e.A, 0));
+    const line = z === "green" ? w.heroGreen : w.heroRisk(w.riskWord(riskPos(r.R.post)), pct, rp(r.lossContinue * e.A, 0));
     h += `<section class="hero z-${z}"><div class="hero-l"><span class="badge z-${z}"><i></i>${w.zone[z]}</span><h2>${w.head[z]}</h2><p>${line}</p>${e.age > 1 ? `<p class="small t-warn">${w.stale(e.age)}</p>` : ""}</div>
       <div class="hero-r"><span>${w.best}</span><b>${esc(e.act)}</b>${r.valueOfPlan > 0.05 ? `<em>${w.worth} ${rp(r.valueOfPlan * e.A, 1)}</em>` : ""}</div></section>`;
   }
@@ -289,7 +297,7 @@ function condition(e) {
   const val = k => k === "nh3n" ? fmt(S2.nh3n, 3) : fmt(S2.vals[k], k === "h2s" ? 3 : Math.abs(S2.vals[k]) >= 20 ? 0 : 1);
   let h = `<div class="tiles">
     <div class="tile"><span>${w.tStress}</span><b>${fmt(S2.si, 0)}<small>/100</small></b><em class="tier t-${S2.tier}">${w.tier[S2.tier] || S2.tier}</em></div>
-    <div class="tile"><span>${w.tRisk}</span><b>${fmt(r.R.post[2] * 100, 0)}<small>%</small></b><div class="risk"><i class="L" style="width:${r.R.post[0] * 100}%"></i><i class="M" style="width:${r.R.post[1] * 100}%"></i><i class="H" style="width:${r.R.post[2] * 100}%"></i></div></div>
+    <div class="tile"><span>${w.tRisk}</span>${riskTile(r.R.post, w)}</div>
     <div class="tile"><span>${w.tHarvest}</span><b>${fmt(r.prod.tonnes * e.A, 1)}<small> t</small></b><em>${w.of} ${fmt(r.prod.healthyT * e.A, 1)} t</em></div></div>`;
   h += `<h3 class="grp">${w.off}</h3>`;
   h += bad.length ? `<div class="params">${bad.map(k => `<div class="prm"><span class="pn">${w.p[k] || k}</span><span class="pv">${val(k)} <small>${UNIT[k] || ""}</small></span><div class="sbar"><i class="${S2.subs[k] >= 0.5 ? "hi" : "mid"}" style="width:${Math.max(6, S2.subs[k] * 100)}%"></i></div></div>`).join("")}</div>` : `<p class="okline">${w.allOk}</p>`;
