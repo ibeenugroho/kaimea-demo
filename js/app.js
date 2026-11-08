@@ -10,11 +10,11 @@ const STR = {
     demo: "Mode demo", live: "Terhubung", local: "Tersimpan di perangkat ini",
     sumNone: "Mulai dengan menambah kolam pertama.", sumAll: "Semua kolam dalam kondisi baik.",
     sumNeed: (n, m) => `<b>${n} dari ${m} kolam</b> perlu tindakan.`, sumWait: "Menghitung kondisi kolam…",
-    stPonds: "Kolam", stNeed: "Perlu tindakan", stStake: "Dipertaruhkan", stDue: "Belum diukur",
+    stPonds: "Kolam", stNeed: "Perlu tindakan", stStake: "Potensi kerugian", stDue: "Belum diukur",
     myPonds: "Kolam saya", sorted: "Yang paling perlu perhatian di atas", addPond: "Tambah kolam",
     zone: { red: "Merah", yellow: "Kuning", green: "Hijau", none: "Belum ada data" },
     head: { red: "Bertindak hari ini", yellow: "Perbaiki & pantau", green: "Kondisi baik", none: "Belum ada data" },
-    doNow: "Lakukan", atStake: "dipertaruhkan", readToday: "diukur hari ini", readYest: "diukur kemarin", readAgo: n => `diukur ${n} hari lalu`,
+    doNow: "Lakukan", atStake: "potensi kerugian", readToday: "diukur hari ini", readYest: "diukur kemarin", readAgo: n => `diukur ${n} hari lalu`,
     noReading: "Belum ada data. Catat pengukuran pertama.",
     pfTitle: "Kolam baru", pfName: "Nama kolam", pfArea: "Luas (ha)", pfStock: "Tanggal tebar", pfDens: "Padat tebar (ekor/m²)", pfType: "Jenis kolam",
     typeHdpe: "Berlapis (HDPE/beton)", typeEarth: "Dasar tanah", save: "Simpan", cancel: "Batal", namePh: "mis. Petak A3",
@@ -24,25 +24,25 @@ const STR = {
     exampleNote: "Kolam bertanda (contoh) adalah data contoh. Hapus dari halaman kolamnya.",
     back: "Semua kolam", tabs: { cond: "Kondisi", plan: "Rencana", log: "Catat data", hist: "Riwayat" },
     riskWord: x => x >= 0.45 ? "tinggi" : x >= 0.15 ? "sedang" : "rendah", rk: { L: "Rendah", M: "Sedang", H: "Tinggi" }, rkSub: "peluang sakit berat",
-    heroRisk: (w, pct, money) => `Risiko penyakit ${w} (peluang sakit berat ${pct}%). Sekitar ${money} dipertaruhkan bila dibiarkan.`,
+    heroRisk: (w, pct, money) => `Risiko penyakit ${w} (peluang sakit berat ${pct}%). Potensi kerugian sekitar ${money} bila dibiarkan.`,
     heroGreen: "Air dalam batas aman. Lanjutkan PROBAL rutin dan ukur setiap hari.",
     best: "Saran utama", worth: "nilai", stale: n => `data terakhir ${n} hari lalu`,
     act: { continue: "Lanjut sesuai SOP", watch: "Pantau ketat, lanjut SOP", harvest: "Panen dini", fix: "Perbaiki air + PROBAL dosis tinggi", boost: "PROBAL dosis tinggi" },
     grp: { Water: "Perbaiki air", PROBAL: "PROBAL", Pathogen: "Tanggap penyakit", Testing: "Pengujian" },
     tiers: ["Catat air setiap hari (gratis)", "Uji kit di tepi kolam", "Uji lab qPCR"],
     how: "Cara melakukannya", done: (d, n) => `${d} dari ${n} selesai`, planNote: "Centang saat selesai. Ukur ulang 1–2 hari setelah perbaikan air.",
-    noPlan: "Tidak ada tindakan khusus. Lanjutkan rutinitas.", saves: "hemat",
+    noPlan: "Tidak ada tindakan khusus. Lanjutkan rutinitas.", saves: "hemat", costLbl: "biaya penanganan", kpi: (si, rk) => `Stres air <b>${si}</b> · Risiko penyakit <b>${rk}</b>`,
     tStress: "Stres air", tRisk: "Risiko penyakit", tHarvest: "Perkiraan panen", of: "dari",
     tier: { Low: "Rendah", Moderate: "Sedang", High: "Tinggi", Critical: "Kritis" },
     off: "Yang perlu diperhatikan", allOk: "Semua yang diukur dalam batas aman.", okList: "Normal",
     clock: (a, b) => `Peluang wabah dalam 7 hari: <b>${a}%</b> tanpa tindakan, <b>${b}%</b> setelah perbaikan air.`,
-    money: "Pilihan dan hasil siklus", moneyQ: "Perkiraan laba operasional (atau rugi) kolam ini untuk siklus ini, setelah pakan, benur, biaya operasional dan biaya tindakan",
+    money: "Pilihan dan hasil siklus", moneyQ: "Perkiraan laba operasional (atau rugi) kolam ini untuk siklus ini, setelah pakan, benur, biaya operasional dan biaya penanganan",
     optC: "Lanjut", optI: "Bertindak", optH: "Panen dini", bestTag: "disarankan", smallGain: (d) => `Bertindak hanya menambah ±${d}, terlalu kecil dibanding usaha dan ketidakpastiannya, jadi disarankan lanjut sesuai SOP.`,
     optCd: "Tanpa tindakan tambahan", optId: "Perbaikan air + PROBAL", optHd: "Jual di ukuran ±9 g", optHn: d => `Udang belum 9 g (±${d} hari lagi)`,
     whenHarvest: d => d > 0 ? `terwujud saat panen, ±${d} hari lagi` : "terwujud saat panen",
     vsC: (d) => `${d} dibanding lanjut`,
-    averted: (a, c) => `kerugian dicegah ${a} − biaya tindakan ${c}`,
-    actWhen: d => `biaya dibayar minggu ini; hasilnya terlihat saat panen${d > 0 ? `, ±${d} hari lagi` : ""}`,
+    averted: (a, c) => `kerugian dicegah ${a} − biaya penanganan ${c}`,
+    actWhen: d => `biaya penanganan dibayar minggu ini; hasilnya terlihat saat panen${d > 0 ? `, ±${d} hari lagi` : ""}`,
     harvAvert: a => `kerugian dihindari ${a}: udang dijual sebelum penyakit memburuk`,
     harvWorse: a => `${a} lebih rendah: panen dini mengorbankan pertumbuhan`,
     harvWhen: "uang diterima dalam ±2 hari",
@@ -70,11 +70,11 @@ const STR = {
     demo: "Demo mode", live: "Connected", local: "Saved on this device",
     sumNone: "Start by adding your first pond.", sumAll: "All ponds are in good shape.",
     sumNeed: (n, m) => `<b>${n} of ${m} ponds</b> need action.`, sumWait: "Checking your ponds…",
-    stPonds: "Ponds", stNeed: "Need action", stStake: "At stake", stDue: "Not read yet",
+    stPonds: "Ponds", stNeed: "Need action", stStake: "Potential loss", stDue: "Not read yet",
     myPonds: "My ponds", sorted: "Most urgent first", addPond: "Add pond",
     zone: { red: "Red", yellow: "Yellow", green: "Green", none: "No data" },
     head: { red: "Act today", yellow: "Fix and watch", green: "Looking good", none: "No data yet" },
-    doNow: "Do", atStake: "at stake", readToday: "read today", readYest: "read yesterday", readAgo: n => `read ${n} days ago`,
+    doNow: "Do", atStake: "potential loss", readToday: "read today", readYest: "read yesterday", readAgo: n => `read ${n} days ago`,
     noReading: "No data yet. Add the first reading.",
     pfTitle: "New pond", pfName: "Pond name", pfArea: "Area (ha)", pfStock: "Stocking date", pfDens: "Density (PL/m²)", pfType: "Pond type",
     typeHdpe: "Lined (HDPE/concrete)", typeEarth: "Earthen bottom", save: "Save", cancel: "Cancel", namePh: "e.g. Pond A3",
@@ -84,25 +84,25 @@ const STR = {
     exampleNote: "Ponds marked (example) are sample data. Delete them from their pond page.",
     back: "All ponds", tabs: { cond: "Condition", plan: "Plan", log: "Add reading", hist: "History" },
     riskWord: x => x >= 0.45 ? "high" : x >= 0.15 ? "moderate" : "low", rk: { L: "Low", M: "Moderate", H: "High" }, rkSub: "chance of serious disease",
-    heroRisk: (w, pct, money) => `Disease risk is ${w} (serious disease ${pct}%). About ${money} at stake if nothing changes.`,
+    heroRisk: (w, pct, money) => `Disease risk is ${w} (serious disease ${pct}%). Potential loss of about ${money} if nothing changes.`,
     heroGreen: "Water is in range. Keep routine PROBAL and daily readings.",
     best: "Best move", worth: "worth", stale: n => `last reading ${n} days old`,
     act: { continue: "Continue as usual", watch: "Watch closely, keep to SOP", harvest: "Harvest early", fix: "Fix water + PROBAL boost", boost: "PROBAL boost" },
     grp: { Water: "Fix the water", PROBAL: "PROBAL", Pathogen: "Disease response", Testing: "Testing" },
     tiers: ["Log water daily (free)", "Pond-side kit test", "Lab qPCR test"],
     how: "How to do it", done: (d, n) => `${d} of ${n} done`, planNote: "Tick items when done. Re-measure 1–2 days after a water fix.",
-    noPlan: "Nothing special to do. Keep the routine.", saves: "saves",
+    noPlan: "Nothing special to do. Keep the routine.", saves: "saves", costLbl: "treatment cost", kpi: (si, rk) => `Water stress <b>${si}</b> · Disease risk <b>${rk}</b>`,
     tStress: "Water stress", tRisk: "Disease risk", tHarvest: "Expected harvest", of: "of",
     tier: { Low: "Low", Moderate: "Moderate", High: "High", Critical: "Critical" },
     off: "What needs attention", allOk: "Everything measured is in range.", okList: "In range",
     clock: (a, b) => `Chance of an outbreak within 7 days: <b>${a}%</b> with no action, <b>${b}%</b> after the water fix.`,
-    money: "Options and cycle result", moneyQ: "Expected operating profit (or loss) for this pond this cycle, after feed, post-larvae, running costs and the cost of the action",
+    money: "Options and cycle result", moneyQ: "Expected operating profit (or loss) for this pond this cycle, after feed, post-larvae, running costs and treatment costs",
     optC: "Continue", optI: "Act", optH: "Harvest early", bestTag: "recommended", smallGain: (d) => `Acting would add only about ${d}, too little for the effort and uncertainty, so keep to the SOP.`,
     optCd: "No extra action", optId: "Water fix + PROBAL", optHd: "Sell at about 9 g", optHn: d => `Shrimp not 9 g yet (~${d} days)`,
     whenHarvest: d => d > 0 ? `realised at harvest, in about ${d} days` : "realised at harvest",
     vsC: (d) => `${d} vs continuing`,
-    averted: (a, c) => `loss averted ${a} − action cost ${c}`,
-    actWhen: d => `cost paid this week; the result shows at harvest${d > 0 ? `, in about ${d} days` : ""}`,
+    averted: (a, c) => `loss averted ${a} − treatment cost ${c}`,
+    actWhen: d => `treatment cost paid this week; the result shows at harvest${d > 0 ? `, in about ${d} days` : ""}`,
     harvAvert: a => `loss avoided ${a}: shrimp sold before disease gets worse`,
     harvWorse: a => `${a} less: harvesting early gives up growth`,
     harvWhen: "money received within about 2 days",
@@ -260,7 +260,7 @@ function card(e) {
   const w = W(), z = e.r ? e.r.zone : "none";
   const when = !e.last ? "" : e.age <= 0 ? w.readToday : e.age === 1 ? w.readYest : w.readAgo(e.age);
   let body;
-  if (e.r) body = `<p class="pc-do"><span>${w.doNow}</span>${esc(e.act)}</p>
+  if (e.r) body = `<p class="pc-kpi">${w.kpi(fmt(e.r.S.si, 0), fmt(e.r.R.post[2] * 100, 0) + "%")}</p><p class="pc-do"><span>${w.doNow}</span>${esc(e.act)}</p>
     ${z !== "green" ? `<p class="pc-money">${rp(e.r.lossContinue * e.A, 0)} <span>${w.atStake}</span></p>` : ""}`;
   else body = `<p class="pc-wait">${e.last ? esc(e.status === "pending" ? w.pending : w.err[e.status] || w.err.offline) : w.noReading}</p>`;
   return `<button type="button" class="pc z-${z}" data-pond="${esc(e.p.id)}">
@@ -298,7 +298,7 @@ function plan(e) {
   let h = `<div class="progress"><span>${w.done(nd, cl.length)}</span><div class="pbar"><i style="width:${cl.length ? nd / cl.length * 100 : 0}%"></i></div></div>`, grp = "";
   cl.forEach(c => {
     if (c.grp !== grp) { if (grp) h += `</div>`; grp = c.grp; h += `<h3 class="grp">${w.grp[grp]}</h3><div class="todo">`; }
-    const d = !!done[c.key], cost = c.cost ? (c.cost < 0 ? w.saves + " " + rp(-c.cost) : rp(c.cost)) : "";
+    const d = !!done[c.key], cost = c.cost ? (c.cost < 0 ? w.saves + " " + rp(-c.cost) : w.costLbl + " " + rp(c.cost)) : "";
     h += `<div class="item ${d ? "done" : ""}"><label class="check"><input type="checkbox" data-key="${esc(c.key)}" ${d ? "checked" : ""}><span class="ttl">${esc(c.title)}</span>${cost ? `<span class="cost">${cost}</span>` : ""}</label>
       ${c.what && c.what !== c.title ? `<details><summary>${w.how}</summary><p>${esc(c.what)}</p></details>` : ""}</div>`;
   });
