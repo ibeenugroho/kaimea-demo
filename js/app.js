@@ -13,15 +13,15 @@ const STR = {
     stPonds: "Kolam", stNeed: "Perlu tindakan", stStake: "Potensi kerugian", stDue: "Belum diukur",
     myPonds: "Kolam saya", sorted: "Yang paling perlu perhatian di atas", addPond: "Tambah kolam",
     zone: { red: "Merah", yellow: "Kuning", green: "Hijau", none: "Belum ada data" },
-    head: { red: "Bertindak hari ini", yellow: "Perbaiki & pantau", green: "Kondisi baik", none: "Belum ada data" },
-    doNow: "Lakukan", atStake: "potensi kerugian", readToday: "diukur hari ini", readYest: "diukur kemarin", readAgo: n => `diukur ${n} hari lalu`,
+    head: { red: "Lakukan hari ini", yellow: "Perbaiki & pantau", green: "Kondisi baik", none: "Belum ada data" },
+    doNow: "Lakukan:", atStake: "potensi kerugian", more: n => `+${n} langkah lain di Rencana`, watch2: "Pantau ketat", pathShort: { wssv: "Biosekuriti WSSV", pirab: "Tangani pirAB (AHPND): kurangi pakan, sipon", imnv: "Tangani IMNV: hindari stres", ehp: "Lindungi pertumbuhan (EHP)" }, readToday: "diukur hari ini", readYest: "diukur kemarin", readAgo: n => `diukur ${n} hari lalu`,
     noReading: "Belum ada data. Catat pengukuran pertama.",
     pfTitle: "Kolam baru", pfName: "Nama kolam", pfArea: "Luas (ha)", pfStock: "Tanggal tebar", pfDens: "Padat tebar (ekor/m²)", pfType: "Jenis kolam",
     typeHdpe: "Berlapis (HDPE/beton)", typeEarth: "Dasar tanah", save: "Simpan", cancel: "Batal", namePh: "mis. Petak A3",
     settings: "Pengaturan", lossCase: "Dasar kerugian penyakit", caseA: "Kasus A (bawaan)", caseB: "Kasus B (hati-hati)",
     caseHint: "A: sekitar 6 dari 10 kolam terkena penyakit per siklus. B: sekitar 4–5 dari 10.",
     pEarly: "Peluang tindakan cukup dini", pEarlyHint: "Biarkan 0,5 sampai uji lapangan memberi angka sendiri.",
-    exampleNote: "Kolam bertanda (contoh) adalah data contoh. Hapus dari halaman kolamnya.",
+    exampleNote: "Kolam bertanda (contoh) adalah data contoh.", delCard: "Hapus kolam", delCardArm: "Hapus?",
     back: "Semua kolam", tabs: { cond: "Kondisi", plan: "Rencana", log: "Catat data", hist: "Riwayat" },
     riskWord: x => x >= 0.45 ? "tinggi" : x >= 0.15 ? "sedang" : "rendah", rk: { L: "Rendah", M: "Sedang", H: "Tinggi" }, rkSub: "peluang sakit berat",
     heroRisk: (w, pct, money) => `Risiko penyakit ${w} (peluang sakit berat ${pct}%). Potensi kerugian sekitar ${money} bila dibiarkan.`,
@@ -74,14 +74,14 @@ const STR = {
     myPonds: "My ponds", sorted: "Most urgent first", addPond: "Add pond",
     zone: { red: "Red", yellow: "Yellow", green: "Green", none: "No data" },
     head: { red: "Act today", yellow: "Fix and watch", green: "Looking good", none: "No data yet" },
-    doNow: "Do", atStake: "potential loss", readToday: "read today", readYest: "read yesterday", readAgo: n => `read ${n} days ago`,
+    doNow: "Do:", atStake: "potential loss", more: n => `+${n} more steps in the Plan`, watch2: "Watch closely", pathShort: { wssv: "WSSV biosecurity", pirab: "Handle pirAB (AHPND): cut feed, siphon", imnv: "Handle IMNV: avoid stress", ehp: "Protect growth (EHP)" }, readToday: "read today", readYest: "read yesterday", readAgo: n => `read ${n} days ago`,
     noReading: "No data yet. Add the first reading.",
     pfTitle: "New pond", pfName: "Pond name", pfArea: "Area (ha)", pfStock: "Stocking date", pfDens: "Density (PL/m²)", pfType: "Pond type",
     typeHdpe: "Lined (HDPE/concrete)", typeEarth: "Earthen bottom", save: "Save", cancel: "Cancel", namePh: "e.g. Pond A3",
     settings: "Settings", lossCase: "Disease-loss baseline", caseA: "Case A (default)", caseB: "Case B (cautious)",
     caseHint: "A: about 6 in 10 ponds get disease in a cycle. B: about 4–5 in 10.",
     pEarly: "Chance action is early enough", pEarlyHint: "Keep 0.5 until a field trial gives your own number.",
-    exampleNote: "Ponds marked (example) are sample data. Delete them from their pond page.",
+    exampleNote: "Ponds marked (example) are sample data.", delCard: "Delete pond", delCardArm: "Delete?",
     back: "All ponds", tabs: { cond: "Condition", plan: "Plan", log: "Add reading", hist: "History" },
     riskWord: x => x >= 0.45 ? "high" : x >= 0.15 ? "moderate" : "low", rk: { L: "Low", M: "Moderate", H: "High" }, rkSub: "chance of serious disease",
     heroRisk: (w, pct, money) => `Disease risk is ${w} (serious disease ${pct}%). Potential loss of about ${money} if nothing changes.`,
@@ -234,7 +234,10 @@ function renderFarm() {
       <div class="stat"><span>${w.stNeed}</span><b class="${need ? "t-bad" : "t-ok"}">${need}<small> / ${ok.length}</small></b></div>
       <div class="stat"><span>${w.stStake}</span><b>${rp(stake, 0)}</b></div>
       <div class="stat"><span>${w.stDue}</span><b class="${due ? "t-warn" : "t-ok"}">${due}</b></div></div>` : ""}</section>`;
-  h += `<div class="bar-head"><div><h2>${w.myPonds}</h2>${S.ponds.length > 1 ? `<span class="muted">${w.sorted}</span>` : ""}</div><button class="btn primary" id="addPond">+ ${w.addPond}</button></div>`;
+  h += `<div class="bar-head"><div><h2>${w.myPonds}</h2>${(() => { const ex = S.ponds.some(p => /\((contoh|example)\)/i.test(p.name || "")), parts = [S.ponds.length > 1 ? w.sorted : "", ex ? w.exampleNote : ""].filter(Boolean); return parts.length ? `<span class="muted">${parts.join(" · ")}</span>` : ""; })()}</div><div class="head-btns"><button type="button" class="btn icon${S.showSet ? " on" : ""}" id="setBtn" aria-label="${w.settings}" title="${w.settings}" aria-expanded="${S.showSet ? "true" : "false"}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg></button><button class="btn primary" id="addPond">+ ${w.addPond}</button></div></div>`;
+  if (S.showSet) h += `<div class="settings card"><h3>${w.settings}</h3><div class="fgrid">
+    <label class="fld"><span>${w.lossCase}</span><select id="ff_lc"><option value="A" ${S.farm.lossCase === "B" ? "" : "selected"}>${w.caseA}</option><option value="B" ${S.farm.lossCase === "B" ? "selected" : ""}>${w.caseB}</option></select><em>${w.caseHint}</em></label>
+    <label class="fld"><span>${w.pEarly}</span><input id="ff_pe" type="number" step="0.05" min="0" max="1" value="${esc(S.farm.pEarly)}"><em>${w.pEarlyHint}</em></label></div></div>`;
   if (S.adding) h += `<form class="card form-card" id="pondForm"><h3>${w.pfTitle}</h3><div class="fgrid">
     <label class="fld wide"><span>${w.pfName}</span><input id="pf_name" required maxlength="40" placeholder="${w.namePh}"></label>
     <label class="fld"><span>${w.pfArea}</span><input id="pf_area" type="number" step="0.05" min="0.05" value="0.5" required></label>
@@ -243,30 +246,48 @@ function renderFarm() {
     <label class="fld"><span>${w.pfType}</span><select id="pf_type"><option value="hdpe">${w.typeHdpe}</option><option value="earthen">${w.typeEarth}</option></select></label></div>
     <div class="row-end"><button type="button" class="btn ghost" id="pf_cancel">${w.cancel}</button><button class="btn primary" type="submit">${w.save}</button></div></form>`;
   if (S.ponds.length) h += `<div class="ponds">` + ev.map(card).join("") + `</div>`;
-  if (S.ponds.some(p => /\((contoh|example)\)/i.test(p.name || ""))) h += `<p class="muted small">${w.exampleNote}</p>`;
-  h += `<details class="settings"><summary>${w.settings}</summary><div class="fgrid">
-    <label class="fld"><span>${w.lossCase}</span><select id="ff_lc"><option value="A" ${S.farm.lossCase === "B" ? "" : "selected"}>${w.caseA}</option><option value="B" ${S.farm.lossCase === "B" ? "selected" : ""}>${w.caseB}</option></select><em>${w.caseHint}</em></label>
-    <label class="fld"><span>${w.pEarly}</span><input id="ff_pe" type="number" step="0.05" min="0" max="1" value="${esc(S.farm.pEarly)}"><em>${w.pEarlyHint}</em></label></div></details>`;
   $("view").innerHTML = h;
-  document.querySelectorAll("[data-pond]").forEach(el => el.addEventListener("click", () => { location.hash = "p-" + el.dataset.pond; }));
+  document.querySelectorAll("[data-pond]").forEach(el => {
+    el.addEventListener("click", () => { location.hash = "p-" + el.dataset.pond; });
+    el.addEventListener("keydown", k => { if ((k.key === "Enter" || k.key === " ") && k.target === el) { k.preventDefault(); location.hash = "p-" + el.dataset.pond; } });
+  });
+  document.querySelectorAll("[data-delcard]").forEach(b => b.addEventListener("click", ev => {
+    ev.stopPropagation(); const id = b.dataset.delcard, key = "card:" + id;
+    if (S.delArm !== key) { S.delArm = key; render(); setTimeout(() => { if (S.delArm === key) { S.delArm = null; render(); } }, 5000); return; }
+    S.delArm = null; S.readings.filter(r => r.pondId === id).forEach(r => remove("readings", r.id)); remove("ponds", id); toast(w.toastDelP); render();
+  }));
   $("addPond").onclick = () => { S.adding = true; render(); setTimeout(() => $("pf_name") && $("pf_name").focus(), 0); };
   const pf = $("pondForm");
   if (pf) { pf.onsubmit = ev2 => { ev2.preventDefault(); S.adding = false; put("ponds", uid("p"), { name: $("pf_name").value.trim(), area: +$("pf_area").value, stockDate: $("pf_stock").value || null, density: +$("pf_dens").value || null, pondType: $("pf_type").value, createdAt: Date.now() }); toast(w.toastPond); };
     $("pf_cancel").onclick = () => { S.adding = false; render(); }; }
-  $("ff_lc").onchange = ev2 => { S.farm.lossCase = ev2.target.value === "B" ? "B" : "A"; save(); toast(w.toastSet); render(); };
-  $("ff_pe").onchange = ev2 => { S.farm.pEarly = Math.min(1, Math.max(0, +ev2.target.value || 0.5)); save(); toast(w.toastSet); render(); };
+  $("setBtn").onclick = () => { S.showSet = !S.showSet; render(); };
+  if ($("ff_lc")) $("ff_lc").onchange = ev2 => { S.farm.lossCase = ev2.target.value === "B" ? "B" : "A"; save(); toast(w.toastSet); render(); };
+  if ($("ff_pe")) $("ff_pe").onchange = ev2 => { S.farm.pEarly = Math.min(1, Math.max(0, +ev2.target.value || 0.5)); save(); toast(w.toastSet); render(); };
+}
+// Tile action list: the main move broken into concrete steps (max 3), rest counted.
+function actList(e, w) {
+  const r = e.r, L = [];
+  if (r.best === "harvest") L.push(w.act.harvest);
+  (r.pathItems || []).forEach(i => { const k = /WSSV/.test(i.title) ? "wssv" : /pirAB/.test(i.title) ? "pirab" : /IMNV/.test(i.title) ? "imnv" : /EHP/.test(i.title) ? "ehp" : null; L.push(k ? w.pathShort[k] : i.title); });
+  if (r.best === "intervene") { (r.plan.items || []).forEach(i => L.push(i.title.replace(/\s*\(.*?\)\s*/g, " ").trim())); L.push(w.act.boost); }
+  if (r.best === "continue") { if (r.zone !== "green") L.push(w.watch2); L.push(w.act.continue); }
+  const shown = L.slice(0, 3), rest = L.length - shown.length;
+  return `<ul>${shown.map(t => `<li>${esc(t)}</li>`).join("")}</ul>${rest > 0 ? `<em class="pc-more">${w.more(rest)}</em>` : ""}`;
 }
 function card(e) {
   const w = W(), z = e.r ? e.r.zone : "none";
   const when = !e.last ? "" : e.age <= 0 ? w.readToday : e.age === 1 ? w.readYest : w.readAgo(e.age);
   let body;
-  if (e.r) body = `<p class="pc-kpi">${w.kpi(fmt(e.r.S.si, 0), fmt(e.r.R.post[2] * 100, 0) + "%")}</p><p class="pc-do"><span>${w.doNow}</span>${esc(e.act)}</p>
-    ${z !== "green" ? `<p class="pc-money">${rp(e.r.lossContinue * e.A, 0)} <span>${w.atStake}</span></p>` : ""}`;
-  else body = `<p class="pc-wait">${e.last ? esc(e.status === "pending" ? w.pending : w.err[e.status] || w.err.offline) : w.noReading}</p>`;
-  return `<button type="button" class="pc z-${z}" data-pond="${esc(e.p.id)}">
+  // Six fixed rows so every card lines up: badge, name, loss, stress/risk, steps, meta (empty rows keep their height).
+  if (e.r) body = `<p class="pc-money">${z !== "green" ? `<span>${w.stStake}</span> ${rp(e.r.lossContinue * e.A, 0)}` : ""}</p>
+    <p class="pc-kpi">${w.kpi(fmt(e.r.S.si, 0), fmt(e.r.R.post[2] * 100, 0) + "%")}</p><div class="pc-do"><span>${w.doNow}</span>${actList(e, w)}</div>`;
+  else body = `<p class="pc-money"></p><p class="pc-kpi"></p><p class="pc-wait">${e.last ? esc(e.status === "pending" ? w.pending : w.err[e.status] || w.err.offline) : w.noReading}</p>`;
+  const armed = S.delArm === "card:" + e.p.id;
+  return `<div class="pc z-${z}" role="button" tabindex="0" data-pond="${esc(e.p.id)}">
+    <button type="button" class="pc-del${armed ? " armed" : ""}" data-delcard="${esc(e.p.id)}" aria-label="${w.delCard}: ${esc(pname(e.p.name))}" title="${w.delCard}"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>${armed ? `<span>${w.delCardArm}</span>` : ""}</button>
     <span class="badge z-${z}"><i></i>${w.head[z]}</span><span class="pc-name">${esc(pname(e.p.name))}</span>
     ${body}
-    <div class="pc-meta">${fmt(+e.p.area || 1, 2)} ha${e.doc ? ` · DOC ${e.doc}` : ""}${when ? ` · <span class="${e.age > 1 ? "t-warn" : ""}">${when}</span>` : ""}</div></button>`;
+    <div class="pc-meta">${fmt(+e.p.area || 1, 2)} ha${e.doc ? ` · DOC ${e.doc}` : ""}${when ? ` · <span class="${e.age > 1 ? "t-warn" : ""}">${when}</span>` : ""}</div></div>`;
 }
 
 /* ---------- pond screen ---------- */

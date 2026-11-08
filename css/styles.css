@@ -185,3 +185,24 @@ td{padding:10px;border-bottom:1px solid var(--line)} tr:last-child td{border-bot
 .tile em.rk{font-size:13px;font-weight:600}
 .opt em strong{font-weight:700;font-style:normal} .opt em strong.t-good{color:#2e8b57} .opt em + em{margin-top:2px}
 .pc-kpi{font-size:12.5px;color:var(--muted);margin:2px 0 0} .pc-kpi b{color:var(--ink,#14211f);font-weight:700}
+.pc-do ul{margin:2px 0 0;padding-left:18px} .pc-do li{margin:1px 0;line-height:1.35} .pc-do li::marker{color:var(--muted)} .pc-more{display:block;font-style:normal;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+.pc-money{margin-top:-2px}
+/* rows line up across cards (subgrid) */
+@supports (grid-template-rows: subgrid) {
+  .ponds{grid-auto-rows:auto;row-gap:0}
+  .pc{display:grid;grid-template-rows:subgrid;grid-row:span 6;row-gap:9px;margin-bottom:14px;align-content:start}
+  .pc .badge{justify-self:start;align-self:start}
+  .pc-meta{margin-top:0;align-self:end}
+  .pc-money:empty,.pc-kpi:empty{min-height:0}
+}
+.head-btns{display:flex;gap:10px;align-items:center}
+.btn.icon{width:44px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;background:var(--surface);color:var(--muted);box-shadow:var(--shadow);border:1px solid var(--line)}
+.btn.icon:hover,.btn.icon.on{color:var(--brand)} .btn.icon.on svg{transform:rotate(45deg)} .btn.icon svg{transition:transform .25s}
+.settings.card{margin:0 0 14px;padding:16px 22px 20px} .settings.card h3{margin:0 0 10px;font-size:15px}
+.ex-note{margin:-4px 0 12px}
+.pc{position:relative}
+.pc-del{all:unset;box-sizing:border-box;position:absolute;top:12px;right:12px;height:32px;min-width:32px;padding:0 8px;display:inline-flex;align-items:center;justify-content:center;gap:5px;border-radius:9px;color:var(--muted);cursor:pointer;font-size:12.5px;font-weight:700;opacity:.55;transition:opacity .15s,background .15s,color .15s}
+.pc:hover .pc-del,.pc-del:focus-visible{opacity:1} .pc-del:hover{background:var(--bad-bg);color:var(--bad);opacity:1}
+.pc-del.armed{opacity:1;background:var(--bad);color:#fff}
+.pc-del:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.pc:focus-visible{outline:3px solid var(--brand);outline-offset:3px}
