@@ -30,7 +30,8 @@ With no engine configured, the dashboard opens with five sample ponds and pre-co
 |---|---|
 | `index.html` | Page structure |
 | `css/styles.css` | Styles (light theme) |
-| `img/kaimea-logo.png` | KAIMEA logo (header and browser tab) |
+| `img/kaimea-logo.png` | KAIMEA logo (page header) |
+| `favicon.ico`, `img/kaimea-icon-*.png` | KAIMEA icon (browser tab and phone home screen) |
 | `js/config.js` | Engine address |
 | `js/api.js` | Calls the engine; looks up demo results |
 | `js/demo-data.js` | Sample ponds and their pre-computed results |
