@@ -18,15 +18,15 @@ const STR = {
     noReading: "Belum ada data. Catat pengukuran pertama.",
     pfTitle: "Kolam baru", pfName: "Nama kolam", pfArea: "Luas (ha)", pfStock: "Tanggal tebar", pfDens: "Padat tebar (ekor/m²)", pfType: "Jenis kolam",
     typeHdpe: "Berlapis (HDPE/beton)", typeEarth: "Dasar tanah", save: "Simpan", cancel: "Batal", namePh: "mis. Petak A3",
-    settings: "Pengaturan", lossCase: "Dasar kerugian penyakit", caseA: "Kasus A (bawaan)", caseB: "Kasus B (hati-hati)",
-    caseHint: "A: sekitar 6 dari 10 kolam terkena penyakit per siklus. B: sekitar 4–5 dari 10.",
-    pEarly: "Peluang tindakan cukup dini", pEarlyHint: "Biarkan 0,5 sampai uji lapangan memberi angka sendiri.",
+    settings: "Pengaturan", lossCase: "Acuan kerugian penyakit", caseA: "Kasus A (default)", caseB: "Kasus B (konservatif)",
+    caseHint: "A: sekitar 6 dari 10 kolam terserang penyakit per siklus. B: sekitar 4–5 dari 10.",
+    pEarly: "Peluang tindakan tepat waktu", pEarlyHint: "Biarkan 0,5 sampai uji lapangan memberi angka untuk tambak Anda.",
     exampleNote: "Kolam bertanda (contoh) adalah data contoh.", delCard: "Hapus kolam", delCardArm: "Hapus?",
     back: "Semua kolam", tabs: { cond: "Kondisi", plan: "Rencana", log: "Catat data", hist: "Riwayat" },
     riskWord: x => x >= 0.45 ? "tinggi" : x >= 0.15 ? "sedang" : "rendah", rk: { L: "Rendah", M: "Sedang", H: "Tinggi" }, rkSub: "peluang sakit berat",
     heroRisk: (w, pct, money) => `Risiko penyakit ${w} (peluang sakit berat ${pct}%). Potensi kerugian sekitar ${money} bila dibiarkan.`,
     heroGreen: "Air dalam batas aman. Lanjutkan PROBAL rutin dan ukur setiap hari.",
-    best: "Saran utama", worth: "nilai", stale: n => `data terakhir ${n} hari lalu`,
+    best: "Saran utama", worth: "untung", stale: n => `data terakhir ${n} hari lalu`,
     act: { continue: "Lanjut sesuai SOP", watch: "Pantau ketat, lanjut SOP", harvest: "Panen dini", fix: "Perbaiki air + PROBAL dosis tinggi", boost: "PROBAL dosis tinggi" },
     grp: { Water: "Perbaiki air", PROBAL: "PROBAL", Pathogen: "Tanggap penyakit", Testing: "Pengujian" },
     tiers: ["Catat air setiap hari (gratis)", "Uji kit di tepi kolam", "Uji lab qPCR"],
@@ -63,7 +63,7 @@ const STR = {
     lined: "berlapis", earthen: "tanah",
     p: { do_min: "DO subuh", nh3n: "Amonia beracun (NH₃)", ph: "pH", ph_swing: "Naik-turun pH", temp_swing: "Naik-turun suhu", temp_mean: "Suhu", salinity: "Salinitas", no2n: "Nitrit", alkalinity: "Alkalinitas", h2s: "H₂S", depth: "Kedalaman", no3n: "Nitrat", tan: "TAN", soil_orp: "ORP dasar kolam", cyano_pct: "Alga biru-hijau" },
     u: { ph_swing: "sore − pagi", cyano_pct: "% plankton" },
-    nf: "id-ID", date: { weekday: "long", day: "numeric", month: "long" },
+    nf: "id-ID", date: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
   },
   en: {
     title: "KAIMEA Farm Dashboard", farmDefault: "My shrimp farm", farmLabel: "Farm name", langLabel: "Language",
@@ -78,15 +78,15 @@ const STR = {
     noReading: "No data yet. Add the first reading.",
     pfTitle: "New pond", pfName: "Pond name", pfArea: "Area (ha)", pfStock: "Stocking date", pfDens: "Density (PL/m²)", pfType: "Pond type",
     typeHdpe: "Lined (HDPE/concrete)", typeEarth: "Earthen bottom", save: "Save", cancel: "Cancel", namePh: "e.g. Pond A3",
-    settings: "Settings", lossCase: "Disease-loss baseline", caseA: "Case A (default)", caseB: "Case B (cautious)",
+    settings: "Settings", lossCase: "Disease-loss basis", caseA: "Case A (default)", caseB: "Case B (cautious)",
     caseHint: "A: about 6 in 10 ponds get disease in a cycle. B: about 4–5 in 10.",
-    pEarly: "Chance action is early enough", pEarlyHint: "Keep 0.5 until a field trial gives your own number.",
+    pEarly: "Chance of acting in time", pEarlyHint: "Keep 0.5 until a field trial gives a number for your farm.",
     exampleNote: "Ponds marked (example) are sample data.", delCard: "Delete pond", delCardArm: "Delete?",
     back: "All ponds", tabs: { cond: "Condition", plan: "Plan", log: "Add reading", hist: "History" },
     riskWord: x => x >= 0.45 ? "high" : x >= 0.15 ? "moderate" : "low", rk: { L: "Low", M: "Moderate", H: "High" }, rkSub: "chance of serious disease",
     heroRisk: (w, pct, money) => `Disease risk is ${w} (serious disease ${pct}%). Potential loss of about ${money} if nothing changes.`,
     heroGreen: "Water is in range. Keep routine PROBAL and daily readings.",
-    best: "Best move", worth: "worth", stale: n => `last reading ${n} days old`,
+    best: "Best move", worth: "gain", stale: n => `last reading ${n} days old`,
     act: { continue: "Continue as usual", watch: "Watch closely, keep to SOP", harvest: "Harvest early", fix: "Fix water + PROBAL boost", boost: "PROBAL boost" },
     grp: { Water: "Fix the water", PROBAL: "PROBAL", Pathogen: "Disease response", Testing: "Testing" },
     tiers: ["Log water daily (free)", "Pond-side kit test", "Lab qPCR test"],
@@ -123,7 +123,7 @@ const STR = {
     lined: "lined", earthen: "earthen",
     p: { do_min: "Dawn DO", nh3n: "Toxic ammonia (NH₃)", ph: "pH", ph_swing: "pH swing", temp_swing: "Temperature swing", temp_mean: "Temperature", salinity: "Salinity", no2n: "Nitrite", alkalinity: "Alkalinity", h2s: "H₂S", depth: "Depth", no3n: "Nitrate", tan: "TAN", soil_orp: "Bottom ORP", cyano_pct: "Blue-green algae" },
     u: { ph_swing: "pm − am", cyano_pct: "% of plankton" },
-    nf: "en-GB", date: { weekday: "long", day: "numeric", month: "long" },
+    nf: "en-GB", date: { weekday: "long", day: "numeric", month: "long", year: "numeric" },
   },
 };
 const UNIT = { do_min: "mg/L", ph: "", ph_swing: "", temp_mean: "°C", temp_swing: "°C", salinity: "ppt", alkalinity: "mg/L", tan: "mg/L", no2n: "mg/L", h2s: "mg/L", depth: "m", no3n: "mg/L", soil_orp: "mV", cyano_pct: "%", nh3n: "mg/L" };
@@ -235,7 +235,7 @@ function renderFarm() {
       <div class="stat"><span>${w.stStake}</span><b>${rp(stake, 0)}</b></div>
       <div class="stat"><span>${w.stDue}</span><b class="${due ? "t-warn" : "t-ok"}">${due}</b></div></div>` : ""}</section>`;
   h += `<div class="bar-head"><div><h2>${w.myPonds}</h2>${(() => { const ex = S.ponds.some(p => /\((contoh|example)\)/i.test(p.name || "")), parts = [S.ponds.length > 1 ? w.sorted : "", ex ? w.exampleNote : ""].filter(Boolean); return parts.length ? `<span class="muted">${parts.join(" · ")}</span>` : ""; })()}</div><div class="head-btns"><button type="button" class="btn icon${S.showSet ? " on" : ""}" id="setBtn" aria-label="${w.settings}" title="${w.settings}" aria-expanded="${S.showSet ? "true" : "false"}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg></button><button class="btn primary" id="addPond">+ ${w.addPond}</button></div></div>`;
-  if (S.showSet) h += `<div class="settings card"><h3>${w.settings}</h3><div class="fgrid">
+  if (S.showSet) h += `<div class="settings card"><h3>${w.settings}</h3><div class="set-grid">
     <label class="fld"><span>${w.lossCase}</span><select id="ff_lc"><option value="A" ${S.farm.lossCase === "B" ? "" : "selected"}>${w.caseA}</option><option value="B" ${S.farm.lossCase === "B" ? "selected" : ""}>${w.caseB}</option></select><em>${w.caseHint}</em></label>
     <label class="fld"><span>${w.pEarly}</span><input id="ff_pe" type="number" step="0.05" min="0" max="1" value="${esc(S.farm.pEarly)}"><em>${w.pEarlyHint}</em></label></div></div>`;
   if (S.adding) h += `<form class="card form-card" id="pondForm"><h3>${w.pfTitle}</h3><div class="fgrid">
@@ -301,7 +301,7 @@ function renderPond(id, tabArg) {
     const r = e.r, z = r.zone, pct = fmt(r.R.post[2] * 100, 0);
     const line = z === "green" ? w.heroGreen : w.heroRisk(w.riskWord(riskPos(r.R.post)), pct, rp(r.lossContinue * e.A, 0));
     h += `<section class="hero z-${z}"><div class="hero-l"><span class="badge z-${z}"><i></i>${w.zone[z]}</span><h2>${w.head[z]}</h2><p>${line}</p>${e.age > 1 ? `<p class="small t-warn">${w.stale(e.age)}</p>` : ""}</div>
-      <div class="hero-r"><span>${w.best}</span><b>${esc(e.act)}</b>${r.valueOfPlan > 0.05 ? `<em>${w.worth} ${rp(r.valueOfPlan * e.A, 1)}</em>` : ""}</div></section>`;
+      <div class="hero-r"><span>${w.best}</span><b>${esc(e.act)}</b>${r.valueOfPlan > 0.05 ? `<em>${w.worth} +${rp(r.valueOfPlan * e.A, 1)}</em>` : ""}</div></section>`;
   }
   h += `<div class="tabcard"><nav class="tabs" role="tablist">${Object.entries(w.tabs).map(([k, v]) => `<a role="tab" href="#p-${esc(p.id)}/${k}" aria-selected="${k === tab}">${v}</a>`).join("")}</nav><div class="panel">`;
   if (tab === "log") h += logForm(p, e);
